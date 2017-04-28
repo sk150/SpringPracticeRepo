@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-ftp="http://www.springframework.org/schema/integration/ftp"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration/ftp http://www.springframework.org/schema/integration/ftp/spring-integration-ftp-4.3.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-4.3.xsd">
+<bean id="ftpClientFactory"
+		class="org.springframework.integration.ftp.session.DefaultFtpSessionFactory">
+		<property name="host" value="192.168.0.76"/>
+		<property name="port" value="21"/>
+		<property name="username" value="thinktalent17"/>
+		<property name="password" value="A11qgtij"/>
+		
+	</bean>
+
+	<int-ftp:inbound-channel-adapter 
+		session-factory="ftpClientFactory" 
+		local-directory="src/test/write"
+		remote-directory="/opt/logs"
+		filename-pattern="*.txt"
+		channel="ftpChannel">
+		<int:poller fixed-rate="1000"></int:poller>
+	</int-ftp:inbound-channel-adapter>
+	
+	<int:channel id="ftpChannel"></int:channel>
+	
+	<int:service-activator ref="filePrinter" method="print" input-channel="ftpChannel"></int:service-activator>
+	<bean id="filePrinter" class="com.practice.FilePrinter"></bean>
+	
+	
+
+</beans>
